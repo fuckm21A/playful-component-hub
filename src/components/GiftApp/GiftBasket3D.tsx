@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { Product } from '@/types/product';
 
@@ -8,62 +8,58 @@ interface GiftBasket3DProps {
   items: Product[];
 }
 
-const Basket = ({ items }: { items: Product[] }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+const BasketMesh = ({ items }: { items: Product[] }) => {
+  const meshRef = useRef<THREE.Group>(null);
 
-  useFrame((state) => {
+  useEffect(() => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.005;
+      meshRef.current.rotation.x = 0.2;
     }
-  });
+  }, []);
 
   return (
-    <mesh ref={meshRef} position={[0, 0, 0]}>
-      <cylinderGeometry args={[2, 1.5, 2, 32]} />
-      <meshPhongMaterial color="#700100" />
+    <group ref={meshRef}>
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[2, 1.5, 2, 32]} />
+        <meshPhongMaterial color="#700100" />
+      </mesh>
+      
       {items.map((item, index) => (
         <mesh
           key={index}
           position={[
-            Math.cos(index * (Math.PI * 2) / items.length),
+            Math.cos(index * (Math.PI * 2) / Math.max(items.length, 1)) * 0.8,
             0.5,
-            Math.sin(index * (Math.PI * 2) / items.length),
+            Math.sin(index * (Math.PI * 2) / Math.max(items.length, 1)) * 0.8,
           ]}
         >
           <boxGeometry args={[0.5, 0.5, 0.5]} />
           <meshPhongMaterial color="#F1F0FB" />
         </mesh>
       ))}
-    </mesh>
+    </group>
   );
 };
 
 const GiftBasket3D = ({ items }: GiftBasket3DProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (containerRef.current) {
       containerRef.current.style.border = '2px dashed #700100';
     }
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     if (containerRef.current) {
       containerRef.current.style.border = '2px solid transparent';
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    handleDragLeave();
-    
-    try {
-      const item = JSON.parse(e.dataTransfer.getData('application/json'));
-      // Handle the dropped item here
-    } catch (error) {
-      console.error('Error parsing dropped item:', error);
-    }
+    handleDragLeave(e);
   };
 
   return (
@@ -74,11 +70,18 @@ const GiftBasket3D = ({ items }: GiftBasket3DProps) => {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <Canvas camera={{ position: [0, 2, 5] }}>
+      <Canvas
+        camera={{ position: [0, 2, 5], fov: 75 }}
+        style={{ background: 'transparent' }}
+      >
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
-        <Basket items={items} />
-        <OrbitControls enableZoom={false} />
+        <BasketMesh items={items} />
+        <OrbitControls 
+          enableZoom={false}
+          minPolarAngle={Math.PI / 4}
+          maxPolarAngle={Math.PI / 2}
+        />
       </Canvas>
     </div>
   );

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchAllProducts } from '@/services/productsApi';
 import { Input } from "@/components/ui/input";
 import { Product } from '@/types/product';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface ProductSelectionPanelProps {
   onItemDrop: (item: Product) => void;
@@ -29,14 +29,13 @@ const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
 
   const categories = ['all', ...new Set(products.map(p => p.category_product))];
 
-  const handleDragStart = (e: React.DragEvent, item: Product) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: Product) => {
     e.dataTransfer.setData('application/json', JSON.stringify(item));
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-4">
       <div className="space-y-4">
-        {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-3 text-gray-400" size={20} />
           <Input
@@ -48,7 +47,6 @@ const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
           />
         </div>
 
-        {/* Categories */}
         <div className="flex gap-2 overflow-x-auto pb-2">
           {categories.map((category) => (
             <button
@@ -65,7 +63,6 @@ const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
           ))}
         </div>
 
-        {/* Products Grid */}
         <div className="grid grid-cols-2 gap-4">
           {filteredProducts.map((product) => (
             <motion.div
