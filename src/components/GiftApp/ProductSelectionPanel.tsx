@@ -12,7 +12,7 @@ interface ProductSelectionPanelProps {
 
 const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('tous');
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
 
   const { data: products = [], isLoading } = useQuery({
@@ -20,14 +20,14 @@ const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
     queryFn: fetchAllProducts
   });
 
+  const categories = ['tous', 'costume', 'veste', 'chemise', 'accessoire'];
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category_product === selectedCategory;
+    const matchesCategory = selectedCategory === 'tous' || product.category_product.toLowerCase() === selectedCategory;
     const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
     return matchesSearch && matchesCategory && matchesPrice;
   });
-
-  const categories = ['all', ...new Set(products.map(p => p.category_product))];
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: Product) => {
     e.dataTransfer.setData('application/json', JSON.stringify(item));
@@ -40,7 +40,7 @@ const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
           <Search className="absolute left-3 top-3 text-gray-400" size={20} />
           <Input
             type="text"
-            placeholder="Search products..."
+            placeholder="Rechercher des produits..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
