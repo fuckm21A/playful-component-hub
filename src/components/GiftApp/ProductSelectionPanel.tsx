@@ -29,8 +29,8 @@ const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
     return matchesSearch && matchesCategory && matchesPrice;
   });
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: Product) => {
-    e.dataTransfer.setData('application/json', JSON.stringify(item));
+  const handleItemClick = (item: Product) => {
+    onItemDrop(item);
   };
 
   return (
@@ -67,11 +67,10 @@ const ProductSelectionPanel = ({ onItemDrop }: ProductSelectionPanelProps) => {
           {filteredProducts.map((product) => (
             <motion.div
               key={product.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, product)}
+              onClick={() => handleItemClick(product)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white rounded-lg shadow-sm p-2 cursor-move"
+              className="bg-white rounded-lg shadow-sm p-2 cursor-pointer"
             >
               <img
                 src={product.image}

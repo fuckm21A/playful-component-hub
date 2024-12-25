@@ -21,7 +21,7 @@ const BasketMesh = ({ items }: { items: Product[] }) => {
     <group ref={groupRef}>
       <mesh position={[0, -1, 0]}>
         <cylinderGeometry args={[2, 1.5, 2, 32]} />
-        <meshPhongMaterial color="#700100" />
+        <meshStandardMaterial color="#700100" roughness={0.5} metalness={0.5} />
       </mesh>
       
       {items.map((item, index) => (
@@ -34,7 +34,7 @@ const BasketMesh = ({ items }: { items: Product[] }) => {
           ]}
         >
           <boxGeometry args={[0.5, 0.5, 0.5]} />
-          <meshPhongMaterial color="#F1F0FB" />
+          <meshStandardMaterial color="#F1F0FB" roughness={0.3} metalness={0.7} />
         </mesh>
       ))}
     </group>
@@ -42,19 +42,11 @@ const BasketMesh = ({ items }: { items: Product[] }) => {
 };
 
 const GiftBasket3D = ({ items }: GiftBasket3DProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   return (
-    <div
-      ref={containerRef}
-      className="h-[400px] rounded-xl bg-white shadow-lg transition-all duration-300"
-    >
-      <Canvas
-        camera={{ position: [0, 2, 5], fov: 75 }}
-        style={{ background: 'transparent' }}
-      >
+    <div className="h-[400px] rounded-xl bg-white shadow-lg">
+      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 2, 5], fov: 75 }}>
         <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
+        <pointLight position={[10, 10, 10]} intensity={1} castShadow />
         <BasketMesh items={items} />
         <OrbitControls 
           enableZoom={false}
